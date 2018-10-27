@@ -3,9 +3,13 @@
 import pkg_resources
 import uuid
 
+from django import utils
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, DateTime, Float
 from xblock.fragment import Fragment
+from xblockutils.resources import ResourceLoader
+from xblockutils.settings import XBlockWithSettingsMixin, ThemableXBlockMixin
+from .utils import _, DummyTranslationService
 
 def resource_string(path):
     """Handy helper for getting resources from our kit."""
@@ -13,24 +17,53 @@ def resource_string(path):
     return data.decode("utf8")
 
 
-class DoneXBlock(XBlock):
+@XBlock.wants('settings')
+@XBlock.needs('i18n')
+class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
     """
     Show a toggle which lets students mark things as done.
     """
 
     done = Boolean(
         scope=Scope.user_state,
-        help="Is the student done?",
+        help=_("Is the student done?"),
         default=False
     )
 
     align = String(
         scope=Scope.settings,
-        help="Align left/right/center",
-        default="left"
+        help=_("Align left/right/center"),
+        default=_("left")
     )
 
     has_score = True
+
+    loader = ResourceLoader(__name__)
+
+    block_settings_key = 'done'
+    default_theme_config = {
+        'package': 'done',
+        'locations': ["static/css/done.css"]
+    }
+
+    @staticmethod
+    def resource_string(path):
+        """Handy helper for getting resources from our kit."""
+        data = pkg_resources.resource_string(__name__, path)
+        return data.decode("utf8")
+
+    @property
+    def i18n_service(self):
+        """ Obtains translation service """
+        return self.runtime.service(self, "i18n") or DummyTranslationService()
+
+    def get_translation_content(self):
+        try:
+            return self.resource_string('static/js/translations/{lang}/textjs.js'.format(
+                lang=utils.translation.get_language(),
+            ))
+        except IOError:
+            return self.resource_string('static/js/translations/en/textjs.js')
 
     # pylint: disable=unused-argument
     @XBlock.json_handler
@@ -59,16 +92,28 @@ class DoneXBlock(XBlock):
         The primary view of the DoneXBlock, shown to students
         when viewing courses.
         """
-        html_resource = resource_string("static/html/done.html")
-        html = html_resource.format(done=self.done,
-                                    id=uuid.uuid1(0))
+        
         (unchecked_png, checked_png) = (
             self.runtime.local_resource_url(self, x) for x in
             ('public/check-empty.png', 'public/check-full.png')
         )
+        if not context:
+            context = {}
 
-        frag = Fragment(html)
+        context.update({
+            'id': uuid.uuid1(0),
+            'done': self.done
+        })
+
+        frag = Fragment()
+        frag.add_content(self.loader.render_django_template(
+            "static/html/done.html",
+            context=context,
+            i18n_service=self.i18n_service,
+        ))
         frag.add_css(resource_string("static/css/done.css"))
+        #frag.add_javascript(self.get_translation_content())
+        #frag.add_javascript(self.resource_string('public/js/poll_common.js'))
         frag.add_javascript(resource_string("static/js/src/done.js"))
         frag.initialize_js("DoneXBlock", {'state': self.done,
                                           'unchecked': unchecked_png,
@@ -76,12 +121,16 @@ class DoneXBlock(XBlock):
                                           'align': self.align.lower()})
         return frag
 
-    def studio_view(self, _context=None):  # pylint: disable=unused-argument
+    def studio_view(self, context=None):  # pylint: disable=unused-argument
         '''
         Minimal view with no configuration options giving some help text.
         '''
-        html = resource_string("static/html/studioview.html")
-        frag = Fragment(html)
+        frag = Fragment()
+        frag.add_content(self.loader.render_django_template(
+            "static/html/studioview.html",
+            context=context,
+            i18n_service=self.i18n_service,
+        ))
         return frag
 
     @staticmethod
@@ -104,27 +153,33 @@ class DoneXBlock(XBlock):
     # It should be included as a mixin.
 
     display_name = String(
-        default="Completion", scope=Scope.settings,
+        default=_("Completion"), scope=Scope.settings,
         help="Display name"
     )
 
     start = DateTime(
         default=None, scope=Scope.settings,
-        help="ISO-8601 formatted string representing the start date "
-             "of this assignment. We ignore this."
+        help=_(
+            "ISO-8601 formatted string representing the start date "
+            "of this assignment. We ignore this."
+        )
     )
 
     due = DateTime(
         default=None, scope=Scope.settings,
-        help="ISO-8601 formatted string representing the due date "
+        help=_(
+            "ISO-8601 formatted string representing the due date "
              "of this assignment. We ignore this."
+        )
     )
 
     weight = Float(
-        display_name="Problem Weight",
-        help=("Defines the number of points each problem is worth. "
-              "If the value is not set, the problem is worth the sum of the "
-              "option point values."),
+        display_name=_("Problem Weight"),
+        help=_(
+            "Defines the number of points each problem is worth. "
+            "If the value is not set, the problem is worth the sum of the "
+            "option point values."
+        ),
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
