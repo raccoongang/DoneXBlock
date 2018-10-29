@@ -1,15 +1,17 @@
 """ Show a toggle which lets students mark things as done."""
 
-import pkg_resources
 import uuid
 
+import pkg_resources
 from django import utils
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Boolean, DateTime, Float
+from xblock.fields import Boolean, DateTime, Float, Scope, String
 from xblock.fragment import Fragment
 from xblockutils.resources import ResourceLoader
-from xblockutils.settings import XBlockWithSettingsMixin, ThemableXBlockMixin
-from .utils import _, DummyTranslationService
+from xblockutils.settings import ThemableXBlockMixin, XBlockWithSettingsMixin
+
+from .utils import DummyTranslationService, _
+
 
 def resource_string(path):
     """Handy helper for getting resources from our kit."""
@@ -57,13 +59,13 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
         """ Obtains translation service """
         return self.runtime.service(self, "i18n") or DummyTranslationService()
 
-    def get_translation_content(self):
+    def get_switch_style(self):
         try:
-            return self.resource_string('static/js/translations/{lang}/textjs.js'.format(
+            return resource_string('static/css/translations/{lang}/switch_style.css'.format(
                 lang=utils.translation.get_language(),
             ))
         except IOError:
-            return self.resource_string('static/js/translations/en/textjs.js')
+            return resource_string('static/css/translations/en/switch_style.css')
 
     # pylint: disable=unused-argument
     @XBlock.json_handler
@@ -111,9 +113,8 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
             context=context,
             i18n_service=self.i18n_service,
         ))
+        frag.add_css(self.get_switch_style())
         frag.add_css(resource_string("static/css/done.css"))
-        #frag.add_javascript(self.get_translation_content())
-        #frag.add_javascript(self.resource_string('public/js/poll_common.js'))
         frag.add_javascript(resource_string("static/js/src/done.js"))
         frag.initialize_js("DoneXBlock", {'state': self.done,
                                           'unchecked': unchecked_png,
@@ -131,6 +132,7 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
             context=context,
             i18n_service=self.i18n_service,
         ))
+        frag.add_css(self.get_switch_style())
         return frag
 
     @staticmethod

@@ -1,0 +1,6 @@
+.done_onoffswitch-inner:after {
+    content: "Marcar como completo";
+}
+.done_onoffswitch-inner:before {
+    content: "Desmarcar";
+}

@@ -17,7 +17,7 @@ def package_data(pkg, roots):
 
 setup(
     name='done-xblock',
-    version='0.1',
+    version='1.0',
     description='done XBlock',   # TODO: write a better description.
     packages=[
         'done',
@@ -30,5 +30,5 @@ setup(
             'done = done:DoneXBlock',
         ]
     },
-    package_data=package_data("done", ["static", "translations"]),
+    package_data=package_data("done", ["static", "translations", "public"]),
 )

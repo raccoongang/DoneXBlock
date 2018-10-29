@@ -45,12 +45,10 @@
 }
 
 .done_onoffswitch-inner:after {
-    content: "Mark as complete";
     padding-left: 40px;
     background-color: rgb(0, 158, 231); color: #FFFFFF;
 }
 .done_onoffswitch-inner:before {
-    content: "Unmark";
     padding-right: 100px;
     background-color: #EEEEEE; color: #999999;
     text-align: right;
