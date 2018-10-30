@@ -55,8 +55,7 @@ msgid "I have completed this"
 msgstr "Eu completei este"
 
 msgid "This is a very simple component with no configuration options. It is used for helping student keep track of what portion of a course they've completed. For example, you might place this underneath each text and video component, and students can see in their progress page which portions are completed and which still need to be watched or read."
-msgstr ""
-"Este é um componente muito simples, sem opções de "
+msgstr "Este é um componente muito simples, sem opções de "
 "configuração. É usado para ajudar o aluno a acompanhar qual "
 "parte de um curso eles concluíram. Por exemplo, você pode "
 "colocar isto embaixo de cada componente de texto e vídeo, e os alunos "
@@ -72,23 +71,3 @@ msgid "(If you're a real power-user, in OLX, we do allow you to add an align tag
 msgstr ""
 "(Se você é um verdadeiro usuário avançado, no OLX, nós permitimos que você "
 "adicione uma tag de alinhamento, que pode justificar à esquerda, ao centro ou à direita do XBlock)"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
