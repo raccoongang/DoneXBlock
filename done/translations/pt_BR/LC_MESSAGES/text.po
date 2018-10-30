@@ -1,0 +1,73 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: XBlocks\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-09-03 09:32+0000\n"
+"PO-Revision-Date: 2018-10-02 19:13+0000\n"
+"Last-Translator: Fabio Oliveira Silva <fabio.oliv.silva@gmail.com>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/xblocks/language/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+
+msgid "Is the student done?"
+msgstr "O aluno terminou?"
+
+msgid "Align left/right/center"
+msgstr "Alinhar esquerda/direita/centro"
+
+msgid "Completion"
+msgstr "Conclusão"
+
+msgid "Display name"
+msgstr "Exibir o nome"
+
+msgid ""
+"ISO-8601 formatted string representing the start date "
+"of this assignment. We ignore this."
+msgstr ""
+"Texto formatado em ISO-8601 representando a data de início "
+"desta tarefa. Nós ignoramos isso."
+
+msgid ""
+"ISO-8601 formatted string representing the due date "
+"of this assignment. We ignore this."
+msgstr ""
+"Texto formatado em ISO-8601 representando a data de vencimento "
+"desta tarefa. Nós ignoramos isso."
+
+msgid "Problem Weight"
+msgstr "Peso do Problema"
+
+msgid ""
+"Defines the number of points each problem is worth. "
+"If the value is not set, the problem is worth the sum of the "
+"option point values."
+msgstr ""
+"Define o número de pontos que cada problema vale. "
+"Se o valor não for definido, o problema vale a soma dos "
+"valores de pontos da opção."
+
+msgid "I have completed this"
+msgstr "Eu completei este"
+
+msgid "This is a very simple component with no configuration options. It is used for helping student keep track of what portion of a course they've completed. For example, you might place this underneath each text and video component, and students can see in their progress page which portions are completed and which still need to be watched or read."
+msgstr "Este é um componente muito simples, sem opções de "
+"configuração. É usado para ajudar o aluno a acompanhar qual "
+"parte de um curso eles concluíram. Por exemplo, você pode "
+"colocar isto embaixo de cada componente de texto e vídeo, e os alunos "
+"podem ver na sua página de progresso quais partes estão concluídas e "
+"que ainda precisas ser assistidos ou lidos."
+
+msgid "It is also helpful to give students a way to sign off on having completed something. They are less likely to skip material that way."
+msgstr ""
+"Também é útil dar aos alunos uma maneira de assinar tendo "
+"concluido alguma coisa. Eles são menos propensos a pular o material dessa maneira."
+
+msgid "(If you're a real power-user, in OLX, we do allow you to add an align tag, which can left-, center-, or right-justify the XBlock)"
+msgstr ""
+"(Se você é um verdadeiro usuário avançado, no OLX, nós permitimos que você "
+"adicione uma tag de alinhamento, que pode justificar à esquerda, ao centro ou à direita do XBlock)"

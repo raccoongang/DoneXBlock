@@ -1,0 +1,6 @@
+.done_onoffswitch-inner:after {
+    content: "Mark as complete";
+}
+.done_onoffswitch-inner:before {
+    content: "Unmark";
+}
