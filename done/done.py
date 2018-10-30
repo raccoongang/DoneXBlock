@@ -42,18 +42,6 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
 
     loader = ResourceLoader(__name__)
 
-    block_settings_key = 'done'
-    default_theme_config = {
-        'package': 'done',
-        'locations': ["static/css/done.css"]
-    }
-
-    @staticmethod
-    def resource_string(path):
-        """Handy helper for getting resources from our kit."""
-        data = pkg_resources.resource_string(__name__, path)
-        return data.decode("utf8")
-
     @property
     def i18n_service(self):
         """ Obtains translation service """
