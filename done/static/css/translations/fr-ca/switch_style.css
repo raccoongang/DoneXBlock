@@ -1,0 +1,6 @@
+.done_onoffswitch-inner:after {
+    content: "Marqué comme complété";
+}
+.done_onoffswitch-inner:before {
+    content: "Décocher";
+}

@@ -3,6 +3,7 @@
 locales:
     - en  # English - Source Language
     - pt_BR  # Portuguese (Brazil)
+    - fr_CA  # French (Canada)
 
 
 # The locales used for fake-accented English, for testing.
