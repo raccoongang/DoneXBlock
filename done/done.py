@@ -7,8 +7,11 @@ from django import utils
 from xblock.core import XBlock
 from xblock.fields import Boolean, DateTime, Float, Scope, String
 from xblock.fragment import Fragment
+from xblock.scorable import ScorableXBlockMixin, Score
 from xblockutils.resources import ResourceLoader
 from xblockutils.settings import ThemableXBlockMixin, XBlockWithSettingsMixin
+
+from xmodule.fields import ScoreField
 
 from .utils import DummyTranslationService, _
 
@@ -21,7 +24,7 @@ def resource_string(path):
 
 @XBlock.wants('settings')
 @XBlock.needs('i18n')
-class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
+class DoneXBlock(XBlock, ScorableXBlockMixin, XBlockWithSettingsMixin, ThemableXBlockMixin):
     """
     Show a toggle which lets students mark things as done.
     """
@@ -38,7 +41,15 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
         default=_("left")
     )
 
+    score = ScoreField(
+        help=_("Dictionary with the current student score"),
+        scope=Scope.user_state,
+        enforce_type=False
+    )
+
     has_score = True
+
+    show_in_read_only_mode = True
 
     loader = ResourceLoader(__name__)
 
@@ -174,6 +185,13 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
         scope=Scope.settings
     )
 
+    raw_earned = Float(
+        help="Keeps maximum score achieved by student as a raw value between 0 and 1.",
+        scope=Scope.user_state,
+        default=0,
+        enforce_type=True,
+    )
+
     def has_dynamic_children(self):
         """Do we dynamically determine our children? No, we don't have any.
         """
@@ -183,3 +201,101 @@ class DoneXBlock(XBlock, XBlockWithSettingsMixin, ThemableXBlockMixin):
         """The maximum raw score of our problem.
         """
         return 1
+
+    # ScorableXBlockMixin methods
+    def set_score(self, score):
+        """
+        Sets the score on this block.
+
+        Takes a Score namedtuple containing a raw
+        score and possible max (for this block, we expect that this will
+        always be 1).
+        """
+        self.score = score
+
+    def get_score(self):
+        """
+        Returns the score currently set on the block.
+        """
+        return self.score
+
+    def weighted_grade(self):
+        """
+        Returns the block's current saved grade multiplied by the block's
+
+        weight- the number of points earned by the learner.
+        """
+        return self.raw_earned * self.weight
+
+    def calculate_score(self):
+        """
+        Returns the score calculated from the current problem state.
+        """
+        new_score = self.score.raw_earned
+        return Score(raw_earned=new_score, raw_possible=self.max_score())
+
+    def publish_grade(self, score=None, only_if_higher=None):
+        """
+        Publishes the student's current grade to the system as an event
+        """
+        if not score:
+            score = self.score
+        earned = score.raw_earned
+        if only_if_higher:
+            earned = self.max_score()
+
+        grade_event = {'value': earned, 'max_value': score.raw_possible, 'only_if_higher': only_if_higher}
+        self.runtime.publish(
+            self,
+            'grade',
+            grade_event
+        )
+        if earned == self.max_score():
+            self.done = True
+        else:
+            self.done = False
+        self.runtime.publish(self, "edx.done.toggled", {'done': self.done})
+
+        return {'grade': self.score.raw_earned, 'max_grade': self.score.raw_possible}
+
+    def rescore(self, only_if_higher):
+        """
+        Calculate a new raw score and save it to the block.
+
+        If only_if_higher is True and the score didn't improve, keep the existing score.
+
+        Raises a TypeError if the block cannot be scored.
+        Raises a ValueError if the user has not yet completed the problem.
+
+        May also raise other errors in self.calculate_score().  Currently
+        unconstrained.
+        """
+        _ = self.runtime.service(self, 'i18n').ugettext
+
+        if not self.allows_rescore():
+            raise TypeError(_('Problem does not support rescoring: {}').format(self.location))
+
+        if not self.has_submitted_answer():
+            raise ValueError(_('Cannot rescore unanswered problem: {}').format(self.location))
+
+        new_score = self.calculate_score()
+        self.publish_grade(new_score, only_if_higher)
+
+    def allows_rescore(self):
+        """
+        Boolean value: Can this problem be rescored?
+
+        Subtypes may wish to override this if they need conditional support for
+        rescoring.
+        """
+        return True
+
+    def has_submitted_answer(self):
+        """
+        Checks that record already exist for xblock in student module
+        """
+        submitted = getattr(self.score, 'raw_earned', None)
+        if submitted is None:
+            return False
+        else:
+            return True
